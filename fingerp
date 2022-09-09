@@ -1,0 +1,229 @@
+/* manifest.json */
+
+{
+ "name": "Fingerprint Protection",
+ "version": "0.1.2",
+ "manifest_version": 2,
+ "content_scripts": [
+  {
+   "all_frames": true,
+   "matches": [ "http://*/*", "https://*/*" ],
+   "run_at": "document_start",
+   "js": [ "content_script.js" ]
+  }
+ ]
+}
+
+/* content_script.js */
+
+function injectFunc(func) {
+ const s = document.createElement('script')
+ s.textContent = '(' + func + ')(window)'
+ document.documentElement.appendChild(s)
+}
+
+injectFunc(function FingerprintProtection(self) {
+ 'use strict'
+
+ class FakeClientRects {
+  static getClientRects(obj, func, args) {
+   const l = func.apply(obj, args)
+   for (let r of l) {
+    this._fakeDOMRect(r)
+   }
+   return l
+  }
+
+  static getBoundingClientRect(obj, func, args) {
+   const r = func.apply(obj, args)
+   this._fakeDOMRect(r)
+   return r
+  }
+
+  static _fakeDOMRect(rect) {
+   rect.x += Math.random()
+   rect.y += Math.random()
+   rect.width += Math.random()
+   rect.height += Math.random()
+  }
+ }
+
+ class FakeCSSFingerprint {
+  static fake(doc) {
+   Util.randomChoices(5, this._findCSSURLs(doc)).forEach(Util.bind(this, '_request'))
+  }
+
+  static _request(url) {
+   fetch(url).catch(_ => undefined)
+  }
+
+  static _findCSSURLs(doc) {
+   const u = []
+   for (let s of doc.styleSheets) {
+    for (let r of this._getCSSRules(s)) {
+     for (let m of r.cssText.matchAll(/url\(['"]?(.+?)['"]?\)/g)) {
+      u.push(m[1])
+     }
+    }
+   }
+   return u
+  }
+
+  static _getCSSRules(sheet) {
+   try {
+    return sheet.cssRules
+   } catch {
+    return []
+   }
+  }
+ }
+
+ class FakeFrames {
+  static contentWindow(obj, func, args) {
+   const w = func.get.call(obj)
+   FingerprintProtection(w)
+   return w
+  }
+
+  static contentDocument(obj, func, args) {
+   const d = func.get.call(obj)
+   FingerprintProtection(obj.contentWindow)
+   return d
+  }
+ }
+
+ class FakePlugins {
+  static plugins() {
+   const a = this._array()
+   a.refresh = function () { }
+   return a
+  }
+
+  static mimeTypes() {
+   return this._array()
+  }
+
+  static _array() {
+   const a = []
+   a.item = function () { return null }
+   a.namedItem = function () { return null }
+   return a
+  }
+ }
+
+ class Faker {
+  static func(obj, key, cb) {
+   obj[key] = this._wrap(obj[key], key, cb)
+  }
+
+  static prop(obj, key, cb) {
+   Object.defineProperty(obj, key, {
+    configurable: true,
+    get: this._wrap(Object.getOwnPropertyDescriptor(obj, key), key, cb)
+   })
+  }
+
+  static _wrap(func, key, cb) {
+   return function () {
+    console.debug('%cFingerprint Protection\t%c' + key, 'color: yellow', 'color: green')
+    return cb ? cb(this, func, arguments) : undefined
+   }
+  }
+ }
+
+ class Util {
+  static bind(obj, key) {
+   return obj[key].bind(obj)
+  }
+
+  static randomChoices(len, arr) {
+   const c = []
+   while (c.length < len) {
+    const i = Math.floor(Math.random() * arr.length)
+    const v = arr[i]
+    if (v === undefined) {
+     break
+    }
+    c.push(v)
+   }
+   return c
+  }
+ }
+
+ self.addEventListener('load', e => FakeCSSFingerprint.fake(e.target))
+
+ // Audio
+ Faker.func(self.AudioBuffer.prototype, 'copyFromChannel')
+ Faker.func(self.AudioBuffer.prototype, 'getChannelData')
+ Faker.func(self.AudioNode.prototype, 'connect')
+ Faker.func(self.AudioScheduledSourceNode.prototype, 'start')
+ Faker.func(self.AnalyserNode.prototype, 'getFloatFrequencyData')
+ Faker.func(self.AnalyserNode.prototype, 'getByteFrequencyData')
+ Faker.func(self.AnalyserNode.prototype, 'getFloatTimeDomainData')
+ Faker.func(self.AnalyserNode.prototype, 'getByteTimeDomainData')
+ Faker.func(self.OfflineAudioContext.prototype, 'startRendering')
+
+ // Canvas
+ Faker.func(self.HTMLCanvasElement.prototype, 'toDataURL')
+ Faker.func(self.HTMLCanvasElement.prototype, 'toBlob')
+ Faker.prop(self.CanvasRenderingContext2D.prototype, 'getImageData')
+ Faker.prop(self.CanvasRenderingContext2D.prototype, 'getLineDash')
+ Faker.prop(self.CanvasRenderingContext2D.prototype, 'measureText')
+
+ // Client Rects
+ Faker.func(self.Element.prototype, 'getBoundingClientRect', Util.bind(FakeClientRects, 'getBoundingClientRect'))
+ Faker.func(self.Element.prototype, 'getClientRects', Util.bind(FakeClientRects, 'getClientRects'))
+
+ Faker.func(self.Range.prototype, 'getBoundingClientRect', Util.bind(FakeClientRects, 'getBoundingClientRect'))
+ Faker.func(self.Range.prototype, 'getClientRects', Util.bind(FakeClientRects, 'getClientRects'))
+
+ // Gamepad
+ Faker.prop(self.Navigator.prototype, 'getGamepads')
+
+ // Hardware
+ Faker.prop(self.Navigator.prototype, 'activeVRDisplays')
+ Faker.prop(self.Navigator.prototype, 'bluetooth')
+ Faker.prop(self.Navigator.prototype, 'deviceMemory')
+ Faker.prop(self.Navigator.prototype, 'getBattery')
+ Faker.prop(self.Navigator.prototype, 'getVRDisplays')
+ Faker.prop(self.Navigator.prototype, 'hardwareConcurrency')
+ Faker.prop(self.Navigator.prototype, 'keyboard')
+ Faker.prop(self.Navigator.prototype, 'maxTouchPoints')
+
+ // Frames
+ Faker.prop(self.HTMLFrameElement.prototype, 'contentWindow', Util.bind(FakeFrames, 'contentWindow'))
+ Faker.prop(self.HTMLFrameElement.prototype, 'contentDocument', Util.bind(FakeFrames, 'contentDocument'))
+
+ Faker.prop(self.HTMLIFrameElement.prototype, 'contentWindow', Util.bind(FakeFrames, 'contentWindow'))
+ Faker.prop(self.HTMLIFrameElement.prototype, 'contentDocument', Util.bind(FakeFrames, 'contentDocument'))
+
+ // Network
+ Faker.func(self.Navigator.prototype, 'sendBeacon')
+ Faker.prop(self.Navigator.prototype, 'connection')
+
+ // Plugins
+ Faker.prop(self.Navigator.prototype, 'plugins', Util.bind(FakePlugins, 'plugins'))
+ Faker.prop(self.Navigator.prototype, 'mimeTypes', Util.bind(FakePlugins, 'mimeTypes'))
+
+ // WebGL
+ Faker.func(self.WebGLRenderingContext.prototype, 'bindBuffer')
+ Faker.func(self.WebGLRenderingContext.prototype, 'bufferData')
+ Faker.func(self.WebGLRenderingContext.prototype, 'readPixels')
+ Faker.prop(self.WebGLRenderingContext.prototype, 'getParameter')
+
+ Faker.func(self.WebGL2RenderingContext.prototype, 'bindBuffer')
+ Faker.func(self.WebGL2RenderingContext.prototype, 'bufferData')
+ Faker.func(self.WebGL2RenderingContext.prototype, 'readPixels')
+ Faker.prop(self.WebGL2RenderingContext.prototype, 'getParameter')
+
+ // WebRTC
+ Faker.func(self.RTCPeerConnection.prototype, 'createDataChannel')
+ Faker.func(self.MediaDevices.prototype, 'enumerateDevices')
+ Faker.prop(self.MediaDevices.prototype, 'getDisplayMedia')
+ Faker.prop(self.MediaDevices.prototype, 'getSupportedConstraints')
+ Faker.prop(self.MediaDevices.prototype, 'getUserMedia')
+ Faker.prop(self.MediaStreamTrack.prototype, 'getSources')
+ Faker.prop(self.MediaStreamTrack.prototype, 'getMediaDevices')
+ Faker.prop(self.Navigator.prototype, 'getUserMedia')
+ Faker.prop(self.Navigator.prototype, 'webkitGetUserMedia')
+})
