@@ -1,0 +1,17 @@
+@import url('https://fonts.googleapis.com/css?family=Arapey|Cantarell|Comfortaa|Khand|Russo+One|Ubuntu');
+a {
+    text-decoration: none;
+}
+.footer_a:hover {
+    font-weight: bold;
+}
+form {
+    padding: 0.4%;
+}
+body{ 
+	font-family: 'Comfortaa', cursive;
+    text-shadow: 1rem rgba(0, 0, 0, .5);
+    box-shadow: 1rem rgba(0, 0, 0, .5);
+    color: #afafaf;
+}
+

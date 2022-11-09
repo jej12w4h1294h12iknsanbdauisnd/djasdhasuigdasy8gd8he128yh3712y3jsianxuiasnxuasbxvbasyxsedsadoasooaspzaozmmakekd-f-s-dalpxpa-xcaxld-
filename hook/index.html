@@ -1,0 +1,52 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Webhook Sender</title>
+  <meta name="author" content="AzizJaber">
+  <meta name="description" content="Discord Webhook Sender">
+  <meta name="title" content="Webhook Sender">
+  <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+  <link rel="stylesheet" href="stylesheet.css" type="text/css">
+</head>
+<body class="text-center" style="background-color: #292a2b;">
+  <br>
+  <form>
+    <div class="mb-3">
+      <label for="URL_webHook_Input" class="form-label" style="font-size: 20px;"><i class="fas fa-link" style="color:#e31b23;"></i> Webhook URL</label>
+      <input type="url" class="form-control" id="URL_webHook_Input" aria-describedby="webHook" autocomplete="off" required>
+      <div id="URL_webHook" class="form-text">Example: https://discordapp.com/api/webhooks/XXXX/XXXXXX (Required)</div>
+    </div>
+
+    <div class="mb-3">
+      <label for="username" class="form-label" style="font-size: 20px;"><i class="fas fa-robot" style="color:#e31b23;"></i> Bot Username</label>
+      <input type="text" class="form-control" id="username" aria-describedby="username_Webhook" autocomplete="off">
+      <div id="username_Webhook" class="form-text">Example: WebhookBot (Optional)</div>
+    </div>
+
+    <div class="mb-3">
+      <label for="avatar_URL_Input" class="form-label" style="font-size: 20px;"><i class="fas fa-user-astronaut" style="color:#e31b23;"></i> Avatar URL</label>
+      <input type="url" class="form-control" id="avatar_URL_Input" aria-describedby="avatar_URL" autocomplete="off">
+      <div id="avatar_URL" class="form-text">Example: https://4url.ml/90qGV3kmP (Optional)</div>
+    </div>
+
+    <div class="mb-3">
+      <label for="content_Webhook_Input" class="form-label" style="font-size: 20px;"><i class="fas fa-envelope" style="color:#e31b23;"></i> Message Content</label>
+      <textarea class="form-control" id="content_Webhook_Input" aria-describedby="content_Webhook" rows="1"></textarea>
+      <div id="content_Webhook" class="form-text">Example: Hi, Im webhook sender !! (Optional)</div>
+    </div>
+    <button id="btn" class="btn btn-success btn-primary btn-lg"><i class="fas fa-paper-plane"></i> Send The Message</button>
+    <button id="btn2" class="btn btn-danger btn-primary btn-lg"><i class="fas fa-database"></i> Clear LocalStorage</button>
+  </form>
+
+  <footer class="mt-auto">
+    <p><i class="fas fa-quote-left" style="color:#e31b23;"></i> We use local storage to save the inputs value <i class="fas fa-quote-right" style="color:#e31b23;"></i></p>
+    <p>Version 1.0.0, <i class="fas fa-copyright" style="color:#e31b23;"></i> 2022 <a href="https://amorzinho.xyz" class="footer_a" style="color: #e31b23;" target="_blank">Amorzinho</a>, made with <i class="fas fa-heart" style="color:#e31b23;"></i> by <a class="footer_a" style="color: #e31b23;" target="_blank">Asperger</a>.</p>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js" integrity="sha384-q2kxQ16AaE6UbzuKqyBE9/u/KzioAlnx2maXQHiDX9d4/zp8Ok3f+M7DPm+Ib6IU" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.min.js" integrity="sha384-pQQkAEnwaBkjpqZ8RU1fF1AKtTcHJwFl3pblpTlHXybJjHpMYo79HY3hIi4NKxyj" crossorigin="anonymous"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
